@@ -3,6 +3,7 @@
 const inquirer = require("inquirer");
 const mysql = require("mysql");
 const cTable = require("console.table");
+const connection = require("./db_connection")
 
 departmentAdd = function () {
   inquirer
@@ -22,7 +23,7 @@ departmentAdd = function () {
       // create a new
       const { id, name } = answer;
       const newDep = new Department(id, name);
-      newDep.addToDB();
+      newDep.log();
     });
 };
 
@@ -39,7 +40,7 @@ class Department {
 
     //   Create a method that adds new entry to database
     addToDB() {
-
+      
     }
 }
 

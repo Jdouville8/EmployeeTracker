@@ -1,28 +1,9 @@
 const inquirer = require('inquirer')
 const mysql = require('mysql')
 const cTable = require('console.table');
+const connection = require("./db_connection")
 const Department = require("./classes/department")
 
-
-// create the connection information for the sql database
-// var connection = mysql.createConnection({
-//     host: "localhost",
-
-//     port: 3306,
-
-//     user: "root",
-  
-//     // *****ADD PASSWORD******
-//     password: "",
-//     database: "business_DB"
-//   });
-  
-//   // connect to the mysql server and sql database
-//   connection.connect(function(err) {
-//     if (err) throw err;
-    
-//     initPrompt();
-//   });
 // Create inquirer prompt 
 // Ask user to pick an operation ["Department", "Role" or "Employee"]
 initPrompt();
