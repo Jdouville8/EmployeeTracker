@@ -1,62 +1,180 @@
 const inquirer = require('inquirer')
 const mysql = require('mysql')
-const cTable = require('console.table');
+// const cTable = require('console.table');
 const connection = require("./db_connection")
-const Department = require("./classes/department")
 
-// Create inquirer prompt 
-// Ask user to pick an operation ["Department", "Role" or "Employee"]
-initPrompt();
-
-function initPrompt() {
-    inquirer
-      .prompt({
-        name: "operation",
+roleAdd = function () {
+  let department = [];
+  connection.query("SELECT name FROM department", (err, res) => {
+      if (err) throw err;
+      res.forEach((item) => department.push(item.name));
+  }
+      )
+  inquirer
+    .prompt([
+      {
+        name: "title",
+        type: "input",
+        message: "Please provide a role title",
+      },
+      {
+        name: "salary",
+        type: "input",
+        message: "Please provide a yearly salary",
+      },
+      {
+        message: "Select department for your role",
+        name: "department",
         type: "list",
-        message: "Please pick an operation:",
-        choices: ["Department", "Role", "Employee", "exit"]
-      })
-      .then(function(answer) {
-        // based on their answer, either call the bid or the post functions
-        const { operation } = answer
-        if (operation === "Department") {
-          departmentPrompt();
-        }
-        else if(operation === "Role") {
-          rolePrompt();
-        } 
-        else if(operation === "Employee") {
-          employeePrompt();
-        } 
-        else{
+        choices: department
+      }
+    ])
+    .then((answer) => {
+      console.log("New department being added");
+      connection.query("INSERT INTO role SET ?", { title: answer.title, salary: answer.salary }, (err) => {
+        if (err) throw err;
+        console.log("New department created");
+        initPrompt();
+      });
+    });
+};
+
+roleAdd = function () {
+  let department = [];
+  connection.query("SELECT name FROM department", (err, res) => {
+      if (err) throw err;
+      res.forEach((item) => department.push(item.name));
+  }
+      )
+  inquirer
+    .prompt([
+      {
+        name: "title",
+        type: "input",
+        message: "Please provide a role title",
+      },
+      {
+        name: "salary",
+        type: "input",
+        message: "Please provide a yearly salary",
+      },
+      {
+        message: "Select department for your role",
+        name: "department",
+        type: "list",
+        choices: department
+      }
+    ])
+    .then((answer) => {
+      console.log("New department being added");
+      connection.query("INSERT INTO role SET ?", { title: answer.title, salary: answer.salary }, (err) => {
+        if (err) throw err;
+        console.log("New department created");
+        initPrompt();
+      });
+    });
+};
+
+departmentAdd = function () {
+  inquirer
+    .prompt([
+      {
+        name: "name",
+        type: "input",
+        message: "Please provide a department name",
+      },
+    ])
+    .then((answer) => {
+      console.log("New department being added");
+      connection.query("INSERT INTO department SET ?", { name : answer.name }, (err) => {
+        if (err) throw err;
+        console.log("New department created");
+        initPrompt();
+      });
+    });
+};
+
+// View functions
+
+departmentView = () => {
+  connection.query("SELECT * FROM department", (err, res) => {
+    if (err) throw err;
+    console.table(res)
+    initPrompt();
+}
+  );
+}
+
+roleView = () => {
+  connection.query("SELECT * FROM role", (err, res) => {
+    if (err) throw err;
+    console.table(res)
+    initPrompt();
+}
+  );
+}
+
+employeeView = () => {
+  connection.query("SELECT * FROM employee", (err, res) => {
+    if (err) throw err;
+    console.table(res)
+    initPrompt();
+}
+  );
+}
+
+// Prompt initialize
+function initPrompt() {
+  inquirer
+    .prompt({
+      name: "operation",
+      type: "list",
+      message: "Please pick an operation:",
+      choices: ["View a Department", "Add a Department", "View a Role", "Add a Role", "View an Employee", "Add an Employee", "Update an Employee"]
+    })
+    .then(function(answer) {
+      // based on their answer, either call the bid or the post function
+      const { operation } = answer
+
+      switch (operation) {
+
+        case "View a Department":
+          departmentView();
+          break;
+        case "Add a Department":
+          departmentAdd();
+          break;
+        case "View a Role":
+          roleView();
+          break;
+        case "Add a Role":
+          roleAdd();
+          break;
+        case "View an Employee":
+          employeeView();
+          break;
+        case "Add an Employee":
+          employeeAdd();
+        case "Update an Employee":
+          employeeUpdate(); 
+          break;
+        default:
           connection.end();
         }
-      });
-  }
+    })
+}
+
+
+
+
+initPrompt();
+
     // DEPARTMENT ["View a department", "Add a department"]
         // in .then, make a new Department object passing in prompt responses (once deconstructed) in as arguments to be used as key value pairs and passed from there into class object methods
-function departmentPrompt() {
-    inquirer
-    .prompt({
-        name: "operation",
-        type: "list",
-        message: "What would you like to do?",
-        choices: ["View a department", "Add a department", "exit"]
-         })
-        .then(function(answer) {
-                // based on their answer, either call the bid or the post functions
-            const { operation } = answer
-            if (operation === "View a department") {
-                Department.departmentAdd();
-            }
-            else if(operation === "Add a department") {
-                 departmentAdd();
-            } 
-            else{
-                connection.end();
-            }
-        });
-    }
+
+
 
     // ROLE ["View a role", "Add a role"]
     // EMPLOYEE ["View an employee", "Add a employee", "Update an employee role"]
+
+    // module.exports = initPrompt;
