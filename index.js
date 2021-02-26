@@ -35,7 +35,7 @@ employeeAdd = function () {
           type: 'input',
         },
         {
-          message: 'Please provide manager id (if applicable)',
+          message: 'Please provide department id',
           name: 'department_id',
           type: 'input',
         },
@@ -80,15 +80,14 @@ roleAdd = function () {
       {
         message: "Select department for your role",
         name: "department",
-        type: "list",
-        choices: department
+        type: "input"
       }
     ])
     .then((answer) => {
-      console.log("New department being added");
-      connection.query("INSERT INTO role SET ?", { title: answer.title, salary: answer.salary }, (err) => {
+      console.log("New role being added");
+      connection.query("INSERT INTO role SET ?", { title: answer.title, salary: answer.salary, department_id: answer.department }, (err) => {
         if (err) throw err;
-        console.log("New department created");
+        console.log("New role created");
         initPrompt();
       });
     });
