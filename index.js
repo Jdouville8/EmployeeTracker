@@ -3,40 +3,59 @@ const mysql = require('mysql')
 // const cTable = require('console.table');
 const connection = require("./db_connection")
 
-roleAdd = function () {
-  let department = [];
-  connection.query("SELECT name FROM department", (err, res) => {
-      if (err) throw err;
-      res.forEach((item) => department.push(item.name));
-  }
-      )
+employeeAdd = function () {
+  let newEmployee = [];
+  let roles = [];
+  connection.query("SELECT * FROM role", function (err, res) {
+    if (err) throw err;
+    res.forEach((role) => roles.push(role.title));
+  });
   inquirer
-    .prompt([
+  .prompt(
+    [ 
       {
-        name: "title",
+        message: "Enter employee first name",
+        name: "first_name",
         type: "input",
-        message: "Please provide a role title",
       },
       {
-        name: "salary",
+        message: "Enter employee last name",
+        name: "last_name",
         type: "input",
-        message: "Please provide a yearly salary",
       },
-      {
-        message: "Select department for your role",
-        name: "department",
-        type: "list",
-        choices: department
-      }
-    ])
-    .then((answer) => {
-      console.log("New department being added");
-      connection.query("INSERT INTO role SET ?", { title: answer.title, salary: answer.salary }, (err) => {
+    ]
+  ).then((res) => {
+    const {first_name, last_name} = res
+    newEmployee = [first_name, last_name]
+    inquirer.prompt(
+      [
+        {
+          message: 'Please provide role id',
+          name: 'role_id',
+          type: 'input',
+        },
+        {
+          message: 'Please provide manager id (if applicable)',
+          name: 'department_id',
+          type: 'input',
+        },
+      ]
+    ).then((answer) => {
+      connection.query("SELECT id FROM roles WHERE title = ?", [answer.employeeRoles], (err) => {
         if (err) throw err;
-        console.log("New department created");
-        initPrompt();
+        const newEmployeeInfo = {
+          first_name: newEmployee[0],
+          last_name: newEmployee[1],
+          role_id: answer.role_id,
+          department_id: answer.department_id
+        }
+        connection.query("INSERT INTO employee SET ?", newEmployeeInfo, (err, res) => {
+          if (err) throw err;
+          initPrompt();
+        });
       });
     });
+  });
 };
 
 roleAdd = function () {
@@ -155,8 +174,6 @@ function initPrompt() {
           break;
         case "Add an Employee":
           employeeAdd();
-        case "Update an Employee":
-          employeeUpdate(); 
           break;
         default:
           connection.end();
