@@ -4,58 +4,37 @@ const mysql = require('mysql')
 const connection = require("./db_connection")
 
 employeeAdd = function () {
-  let newEmployee = [];
-  let roles = [];
-  connection.query("SELECT * FROM role", function (err, res) {
-    if (err) throw err;
-    res.forEach((role) => roles.push(role.title));
-  });
   inquirer
-  .prompt(
-    [ 
+    .prompt([
       {
-        message: "Enter employee first name",
         name: "first_name",
         type: "input",
+        message: "Please provide a first name",
       },
       {
-        message: "Enter employee last name",
+        message: "Please provide a last name",
         name: "last_name",
-        type: "input",
+        type: "input"
       },
-    ]
-  ).then((res) => {
-    const {first_name, last_name} = res
-    newEmployee = [first_name, last_name]
-    inquirer.prompt(
-      [
-        {
-          message: 'Please provide role id',
-          name: 'role_id',
-          type: 'input',
-        },
-        {
-          message: 'Please provide department id',
-          name: 'department_id',
-          type: 'input',
-        },
-      ]
-    ).then((answer) => {
-      connection.query("SELECT id FROM roles WHERE title = ?", [answer.employeeRoles], (err) => {
+      {
+        message: "Please provide a role id",
+        name: "role_id",
+        type: "input"
+      },
+      {
+        message: "Please provide a department id",
+        name: "department_id",
+        type: "input"
+      }
+    ])
+    .then((answer) => {
+      console.log("New role being added");
+      connection.query("INSERT INTO role SET ?", { title: answer.title, salary: answer.salary, role_id: answer.role_id, department_id: answer.department }, (err) => {
         if (err) throw err;
-        const newEmployeeInfo = {
-          first_name: newEmployee[0],
-          last_name: newEmployee[1],
-          role_id: answer.role_id,
-          department_id: answer.department_id
-        }
-        connection.query("INSERT INTO employee SET ?", newEmployeeInfo, (err, res) => {
-          if (err) throw err;
-          initPrompt();
-        });
+        console.log("New role created");
+        initPrompt();
       });
     });
-  });
 };
 
 roleAdd = function () {
