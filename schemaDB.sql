@@ -1,6 +1,3 @@
--- YOU NEED TO ADD FOREIGN KEYS TO COMPLETE DATA STRUCTURE --
-
-
 DROP DATABASE IF EXISTS business_DB;
 
 CREATE DATABASE business_DB;
@@ -20,20 +17,26 @@ CREATE TABLE role (
   id INT NOT NULL AUTO_INCREMENT,
   title VARCHAR(30) NOT NULL,
   salary DECIMAL NOT NULL,
-  PRIMARY KEY (id)
+  department_id INTEGER,
+  PRIMARY KEY (id),
+  FOREIGN KEY (department_id) REFERENCES department(id)
 );
 
-INSERT INTO role (title, salary)
-VALUES ("Manager", 60000);
+INSERT INTO role (title, salary, department_id)
+VALUES ("Manager", 60000, 1);
 
 CREATE TABLE employee (
   id INT NOT NULL AUTO_INCREMENT,
   first_name VARCHAR(30) NOT NULL,
   last_name VARCHAR(30) NOT NULL,
-  PRIMARY KEY (id)
+  role_id INTEGER,
+  department_id INTEGER,
+  PRIMARY KEY (id),
+  FOREIGN KEY (role_id) REFERENCES role(id),
+  FOREIGN KEY (department_id) REFERENCES department(id)
 );
 
-INSERT INTO employee (first_name, last_name)
-VALUES ("Dave", "Doe");
+INSERT INTO employee (first_name, last_name, role_id, department_id)
+VALUES ("Dave", "Doe", 1, 1);
 
-SELECT * FROM department, role, employee;
+SELECT * FROM role, department;
